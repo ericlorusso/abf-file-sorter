@@ -90,6 +90,18 @@ def directory_walk(payload_dir, file_function, *args):
             directory_walk(file_path, file_function, *args)
 
 
+# this is the same as processHierarhcy, but no outputs files are generated.
+def directory_walk_and_clone(payload_dir, target_dir, file_function, *args):
+    files = os.listdir(payload_dir)
+    for File in files:
+        file_path = os.path.join(payload_dir, File)
+        if os.path.isfile(file_path):
+            file_function(payload_dir, File, *args)
+        else:
+	    output_sub_dir_path = os.mkdir(os.path.join(target_dir, File))
+            directory_walk(file_path, output_sub_dir_path, file_function, *args)
+
+
 
 
 
