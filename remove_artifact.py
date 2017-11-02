@@ -15,35 +15,18 @@ def clean_artifacts(payload_dir, filename, OUT):
 	print("on file: %s" % os.path.join(payload_dir, filename))
 	rec = stfio.read(os.path.join(payload_dir,filename))
 	for channel in rec:
+		section_max = np.asarray(channel)
+		section_max = section_max[section_max.shape[0]-1:]
+		Max = np.amin(section_max[np.amin(section_max):])
+		argmax = np.argmin(section_max[np.amin(section_max):])
+		sections_for_min = []
 		for section in channel:
-			section = section.asarray()
-			thresh_crossed = False
-			value_to_copy = None
-			for k in range(len(section))[1:]:
-				if thresh_crossed == False: 
-					#iterating over single section. check for impulse spikes
-					if abs((section[k] - section[k-1])) >= THRESHOLD:
-						print("threshold crossed at k = %d", k)
-						thresh_crossed = True
-						value_to_copy = section[k-2]
-						section[k] = value_to_copy
-				else:
-					#currently inside an artifact peak.
-					if abs((section[k] - section[k-1])) >= THRESHOLD:
-						print("exited threshold")
-						# you've just crashed back to the normal values. Stop copying & reset flag
-						thresh_crossed = False
-						value_to_copy = None
-					else:
-						# you're still in the middle of an artifact peak
-						print("still in theshold")
-						section[k] = value_to_copy
+			sections_for_min.append(section.asarray()[:3700])
+		matrix_for_min = np.asarray(sections_for_min)
+		Min = np.amin(matrix_for_min)
+		argmin = np.argmin(matrix_for_min)
+			
 
-	cleaned_vals = np.asarray(rec)
-	Min = np.amin(cleaned_vals)
-	Max = np.amax(cleaned_vals)
-	argmax = np.argmax(cleaned_vals)
-	argmin = np.argmin(cleaned_vals)
 	output_line = [os.path.join(payload_dir, filename), len(rec[0][0]), argmin % len(rec[0][0])+1, Min, argmax % len(rec[0][0])+1, Max]
 	output_line = [str(x) for x in output_line]
 	OUT.write(",".join(output_line))
