@@ -15,10 +15,10 @@ def clean_artifacts(payload_dir, filename, OUT):
 	print("on file: %s" % os.path.join(payload_dir, filename))
 	rec = stfio.read(os.path.join(payload_dir,filename))
 	for channel in rec:
-		section_max = np.asarray(channel)
-		section_max = section_max[section_max.shape[0]-1:]
-		Max = np.amin(section_max[np.amin(section_max):])
-		argmax = np.argmin(section_max[np.amin(section_max):])
+		section = np.asarray(channel)
+		last_min = np.argmin(section[-1])
+		Max = np.amax(section[-1][last_min:])
+		argmax = np.argmax(section[-1][last_min:])
 		sections_for_min = []
 		for section in channel:
 			sections_for_min.append(section.asarray()[:3700])
